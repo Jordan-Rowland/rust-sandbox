@@ -1,21 +1,13 @@
 fn main() {
-    let mut s = String::from("hello world");
+    let x = 10;
+    let r = &x;
+    let rr = &r; // `rr` is a `&&x`
 
-    let word = first_word(&s);
-
-    s.clear(); // error!
-
-    println!("the first word is: {}", word);
-}
-
-fn first_word(s: &String) -> &str {
-    let bytes = s.as_bytes();
-
-    for (i, &item) in bytes.iter().enumerate() {
-        if item == b' ' {
-            return &s[..i];
-        }
+    if is_ten(rr) {
+      println!("Same!");
     }
+  }
 
-    &s[..]
-}
+  fn is_ten(val: &i32) -> bool {
+    *val == 10
+  }
