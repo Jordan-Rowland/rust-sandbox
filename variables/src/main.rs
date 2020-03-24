@@ -4,10 +4,10 @@ fn main() {
     let rr = &r; // `rr` is a `&&x`
 
     if is_ten(rr) {
-      println!("Same!");
+        println!("Same!");
     }
-  }
+}
 
-  fn is_ten(val: &i32) -> bool {
+fn is_ten(val: &i32) -> bool {
     *val == 10
-  }
+}

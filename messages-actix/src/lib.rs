@@ -8,6 +8,24 @@ pub struct MessageApp {
     port: u16,
 }
 
+#[derive(Serialize)]
+struct IndexResponse {
+    message: String,
+}
+
+#[get("/")]
+fn index(req: HttpRequest) -> Result<web::Json<IndexResponse>> {
+    let hello = req
+        .headers()
+        .get("hello")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or_else(|| "world");
+
+    Ok(web::Json(IndexResponse {
+        message: hello.to_owned(),
+    }))
+}
+
 impl MessageApp {
     pub fn new(port: u16) -> Self {
         MessageApp { port }
