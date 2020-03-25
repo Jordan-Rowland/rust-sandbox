@@ -176,5 +176,52 @@ fn main() {
         _ => (),
     }
 
-    // if let(like Python's walrus operator :=)
+    // if let - (like Python's walrus operator :=)
+
+    // not this
+    let some_u8_value = Some(0u8);
+    match some_u8_value {
+        Some(3) => println!("three"),
+        _ => (),
+    }
+
+    // this
+    if let Some(3) = some_u8_value {
+        println!("three");
+    }
+
+    // The syntax `if let` takes a pattern and an expression
+    // separated by an equal sign. It works the same
+    // way as a `match`, where the expression is given
+    // to the `match` and the pattern is it's first arm.
+
+    // Using `if let` means less typing but loses the
+    // exhaustive checking that `match` enforces. Choosing
+    // between `match` and `if let` depends on what you're
+    // doing in your particular situation and whether
+    // gaining conciseness is an appropriate trade-off
+    // for losing exhaustive checking.
+
+    // `if let` is syntactic sugar for a `match` that runs
+    // code when the value matches one pattern and ignores
+    // all others.
+
+    // We can also include an `else` block with an
+    // `if let`. The block of code that goes with
+    // the `else` is the same as the block that would
+    // go with the _ case in the match expression.
+
+    let mut count = 0;
+    match coin {
+        Coin::Quarter(state) => println!("{:?}", state),
+        _ => count += 1,
+    }
+
+    // or we could use `if let` and `else`:
+    let mut count = 0;
+    if let Coin::Quarter(state) = coin {
+        println!("{:?}", state);
+    } else {
+        count += 1;
+    }
 }
