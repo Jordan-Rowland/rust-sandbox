@@ -288,4 +288,75 @@ fn main() {
 
     let igpays = igpay(&String::from("Speaking pig latan is super fun"));
     println!("{}", igpays);
+
+    use std::collections::HashMap;
+    use std::io;
+
+    #[allow(unused_mut)]
+    let mut dept_emps_map = HashMap::<String, Vec<String>>::new();
+
+    #[derive(Debug)]
+    enum Action {
+        Add,
+        List,
+        Exit,
+    }
+
+    let mut action_map = HashMap::new();
+    action_map.insert(String::from("add"), Action::Add);
+    action_map.insert(String::from("list"), Action::List);
+    action_map.insert(String::from("exit"), Action::Exit);
+
+    loop {
+        let mut action = String::new();
+        println!("\nWhat would you like to do? (add, list, exit)");
+        io::stdin()
+            .read_line(&mut action)
+            .expect("failed to read line");
+
+        let action_trim = action.trim();
+
+        if action_trim == "add".to_string() {
+            let mut dept = String::new();
+            let mut empl = String::new();
+
+            println!("\nWhat department would you like to add an employee to:");
+            io::stdin()
+                .read_line(&mut dept)
+                .expect("failed to read line");
+
+            println!("Employee name:");
+            io::stdin()
+                .read_line(&mut empl)
+                .expect("failed to read line");
+
+            let dept = dept.trim().to_string();
+            let empl = empl.trim().to_string();
+
+            dept_emps_map.entry(dept.clone()).or_insert(Vec::new());
+
+            let dept_emps = match dept_emps_map.get_mut(&dept) {
+                Some(v) => v.push(empl),
+                None => println!("Could not add new employee"),
+            };
+
+            println!("{:?}", dept_emps_map);
+        } else if action_trim == "list".to_string() {
+            let mut dept_input = String::new();
+            println!("\nWhat department like see:");
+            io::stdin()
+                .read_line(&mut dept_input)
+                .expect("failed to read line");
+
+            if let Some(v) = dept_emps_map.get_mut(dept_input.trim()) {
+                v.sort();
+                for i in v {
+                    println!("\t{}", i);
+                }
+            }
+        } else if action_trim == "exit".to_string() {
+            use std::process;
+            process::exit(0x0100);
+        }
+    }
 }
