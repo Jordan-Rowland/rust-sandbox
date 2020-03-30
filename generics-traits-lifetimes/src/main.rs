@@ -546,7 +546,6 @@ fn main() {
      * annotation on every reference in the structs
      * definition.
      */
-
     struct ImportantExcerpt<'a> {
         part: &'a str,
     }
@@ -563,3 +562,4 @@ fn main() {
      * it holds in its `part` field.
      */
 }
+
