@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::io::prelude::*;
 
+#[derive(Debug)]
 pub struct Data {
     filename: String,
     headers: Vec<String>,
@@ -14,6 +15,7 @@ pub enum Filename {
     New(String),
 }
 
+// New and initialization methods
 impl Data {
     pub fn new(filename: String, headers: Vec<String>) -> Self {
         Self {
@@ -24,6 +26,26 @@ impl Data {
         }
     }
 
+    pub fn from_rows(rows: Vec<HashMap<String, String>>) -> Self {
+        let mut keys = Vec::new();
+        let mut owned_rows = Vec::new();
+        for key in rows[0].keys() {
+            keys.push(key.to_string());
+        }
+        for row in rows {
+            owned_rows.push(row.to_owned());
+        }
+        Self {
+            filename: "".to_string(),
+            headers: keys,
+            rows: owned_rows.clone(),
+            rows_len: owned_rows.len().to_owned(),
+        }
+    }
+}
+
+// Getters
+impl Data {
     pub fn get_headers(&self) -> &Vec<String> {
         &self.headers
     }
@@ -36,6 +58,37 @@ impl Data {
         &self.filename
     }
 
+    pub fn get_column(&self, column: &str) -> Option<Vec<String>> {
+        if !self.headers.contains(&column.to_string()) {
+            return Option::None;
+        }
+        let mut found_columns = Vec::new();
+        for row in &self.rows {
+            let c = row.get(column).unwrap();
+            found_columns.push(c.into());
+        }
+        Some(found_columns)
+    }
+
+    pub fn find_rows_by_column(
+        &self,
+        column: String,
+        value: String,
+    ) -> Vec<&HashMap<String, String>> {
+        self.rows
+            .iter() // READ ON THIS -> .iter
+            .filter(|row| {
+                // READ ON THIS -> .filter
+                row.get(&column.to_lowercase())
+                    .unwrap()
+                    .contains(&value.to_lowercase())
+            })
+            .collect() // READ ON THIS -> .collect
+    }
+}
+
+// Setters
+impl Data {
     pub fn add_row(&mut self, row: HashMap<String, String>) {
         let mut proceed = true;
         for header in &self.headers {
@@ -69,26 +122,17 @@ impl Data {
         self.rows_len -= 1;
     }
 
-    pub fn calc_rows_len(&mut self) {
-        self.rows_len = self.rows.len();
-    }
-
-    pub fn get_column(&self, column: &str) -> Option<Vec<String>> {
-        if !self.headers.contains(&column.to_string()) {
-            return Option::None;
-        }
-        let mut found_columns = Vec::new();
-        for row in &self.rows {
-            let c = row.get(column).unwrap();
-            found_columns.push(c.into());
-        }
-        Some(found_columns)
-    }
-
     pub fn set_filename(&mut self, new_filename: &str) {
         self.filename = new_filename.into()
     }
 
+    pub fn calc_rows_len(&mut self) {
+        self.rows_len = self.rows.len();
+    }
+}
+
+// File io
+impl Data {
     pub fn open_file(filename: &str) -> std::io::Result<Self> {
         let mut contents = String::new();
         File::open(filename)?.read_to_string(&mut contents)?;
@@ -143,22 +187,5 @@ impl Data {
             }
         }
         Ok(())
-    }
-
-    pub fn from_rows(rows: Vec<&HashMap<String, String>>) -> Self {
-        let mut keys = Vec::new();
-        let mut owned_rows = Vec::new();
-        for key in rows[0].keys() {
-            keys.push(key.to_string());
-        }
-        for row in rows {
-            owned_rows.push(row.to_owned());
-        }
-        Self {
-            filename: "".to_string(),
-            headers: keys,
-            rows: owned_rows.clone(),
-            rows_len: owned_rows.len().to_owned(),
-        }
     }
 }
