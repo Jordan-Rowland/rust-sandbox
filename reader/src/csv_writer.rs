@@ -74,9 +74,10 @@ impl Data {
         &self,
         column: String,
         value: String,
-    ) -> Vec<&HashMap<String, String>> {
+    ) -> Vec<HashMap<String, String>> {
         self.rows
-            .iter() // READ ON THIS -> .iter
+            .clone()
+            .into_iter() // READ ON THIS -> .iter
             .filter(|row| {
                 // READ ON THIS -> .filter
                 row.get(&column.to_lowercase())

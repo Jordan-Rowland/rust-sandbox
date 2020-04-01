@@ -38,27 +38,14 @@ fn main() {
 
     d.add_row(h);
     let dc = d.get_column("email");
-    println!("{:?}", dc);
 
-    let f_rows = d
-        .get_rows()
-        .iter()
-        .filter(|row| row.get("name").unwrap().contains("ch"))
-        .collect::<Vec<&HashMap<String, String>>>();
-
-    println!("{:?}", d);
-
-    let mut xx = Vec::new();
-    for row in f_rows {
-        xx.push(row.to_owned())
-    }
-
-    let df = csv_writer::Data::from_rows(xx);
+    let df = csv_writer::Data::from_rows(d.find_rows_by_column("name".into(), "ch".into()));
 
     let dr = df.get_rows();
-    let dr = df.rows;
+    println!("{:?}", dr);
 
-    let fc = d.find_rows_by_column("email".into(), "d".into());
+    let fc = d.find_rows_by_column("name".into(), "ch".into());
+    println!("{:?}", fc);
 }
 
 // let mut data = csv_writer::Data::open_file("test.csv").expect("Expecting data here");
