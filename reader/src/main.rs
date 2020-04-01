@@ -1,15 +1,16 @@
 use std::collections::HashMap;
 
 mod csv_writer;
+use csv_writer::Filename;
 
 fn main() {
-    // let mut data = Data::open_file("test.csv").expect("Expecting data here");
-    // let mut data = Data::open_file("db.csv").expect("Expecting data here");
+    // let mut data = csv_writer::Data::open_file("test.csv").expect("Expecting data here");
+    // let mut data = csv_writer::Data::open_file("db.csv").expect("Expecting data here");
 
-    // println!("{:?}", data.headers);
-    // println!("{:?}", data.rows);
+    // println!("{:?}", data.get_headers());
+    // println!("{:?}", data.get_rows());
     // println!("{:?}", data.rows_len);
-    // println!("{:?}", data.filename);
+    // println!("{:?}", data.get_filename());
 
     // let mut it = true;
     // while it {
@@ -44,7 +45,7 @@ fn main() {
     //     h.insert("salary".to_string(), salary_input.trim().to_lowercase());
     //     data.add_row(h);
 
-    //     data.write_csv(None);
+    // data.write_csv(Filename::Existing);
     //     it = false;
     // }
 
@@ -93,24 +94,20 @@ fn main() {
         "Michael@dundermifflin.com".to_string(),
     );
 
-    // let k = Vec::new();
-    let k = h.keys().to_owned();
-    // println!("{:?}", h.keys());
-    // println!("{:?}", h.keys());
     d.add_row(h);
+    let dc = d.get_column("email");
+    println!("{:?}", dc);
 
-    // println!("{:?}", d.rows);
-    // println!("{:?}", d.rows_len);
-    // println!("{:?}", d.filename.len());
-
-    let mut f_rows = Vec::new();
-    f_rows = d
+    let f_rows = d
         .get_rows()
         .iter()
         .filter(|row| row.get("name").unwrap() == "jim halpert")
         .collect();
-    // println!("{:?}", f_rows);
 
     let df = csv_writer::Data::from_rows(f_rows);
     println!("{:?}", df.get_rows());
+    println!("{:?}", df.rows_len);
+
+    use std::env;
+    println!("{:?}", env::current_dir())
 }

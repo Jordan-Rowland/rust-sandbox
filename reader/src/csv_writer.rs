@@ -6,12 +6,17 @@ pub struct Data {
     filename: String,
     headers: Vec<String>,
     rows: Vec<HashMap<String, String>>,
-    rows_len: usize,
+    pub rows_len: usize,
+}
+
+pub enum Filename {
+    Existing,
+    New(String),
 }
 
 impl Data {
-    pub fn new(filename: String, headers: Vec<String>) -> Data {
-        Data {
+    pub fn new(filename: String, headers: Vec<String>) -> Self {
+        Self {
             filename,
             headers,
             rows: Vec::new(),
@@ -27,6 +32,10 @@ impl Data {
         &self.rows
     }
 
+    pub fn get_filename(&self) -> &str {
+        &self.filename
+    }
+
     pub fn add_row(&mut self, row: HashMap<String, String>) {
         let mut proceed = true;
         for header in &self.headers {
@@ -38,7 +47,7 @@ impl Data {
             self.rows.push(row);
             self.rows_len += 1;
             if self.filename.len() > 1 {
-                if let Ok(()) = self.write_csv(None) {
+                if let Ok(()) = self.write_csv(Filename::Existing) {
                     println!("File updated: {}", self.filename);
                 } else {
                     println!("Couldn't write to file: {}", self.filename);
@@ -64,7 +73,23 @@ impl Data {
         self.rows_len = self.rows.len();
     }
 
-    pub fn open_file(filename: &str) -> std::io::Result<Data> {
+    pub fn get_column(&self, column: &str) -> Option<Vec<String>> {
+        if !self.headers.contains(&column.to_string()) {
+            return Option::None;
+        }
+        let mut found_columns = Vec::new();
+        for row in &self.rows {
+            let c = row.get(column).unwrap();
+            found_columns.push(c.into());
+        }
+        Some(found_columns)
+    }
+
+    pub fn set_filename(&mut self, new_filename: &str) {
+        self.filename = new_filename.into()
+    }
+
+    pub fn open_file(filename: &str) -> std::io::Result<Self> {
         let mut contents = String::new();
         File::open(filename)?.read_to_string(&mut contents)?;
         let mut contents_iter = contents.split("\n");
@@ -85,7 +110,7 @@ impl Data {
                 rows.push(row_hashmap);
             }
         }
-        Ok(Data {
+        Ok(Self {
             headers,
             rows: rows.clone(),
             filename: String::from(filename),
@@ -93,12 +118,13 @@ impl Data {
         })
     }
 
-    fn write_csv(&self, mut filename: Option<String>) -> std::io::Result<()> {
+    pub fn write_csv(&self, filename: Filename) -> std::io::Result<()> {
+        let string_filename: String;
         match filename {
-            Some(_) => (),
-            None => filename = Some(self.filename.clone()),
+            Filename::New(filename) => string_filename = filename.to_owned(),
+            Filename::Existing => string_filename = self.filename.to_owned(),
         }
-        let mut file = File::create(filename.unwrap().to_string())?;
+        let mut file = File::create(string_filename)?;
         for i in 0..self.headers.len() {
             if i == self.headers.len() - 1 {
                 writeln!(file, "{}", &self.headers[i].to_lowercase())?;
@@ -119,7 +145,7 @@ impl Data {
         Ok(())
     }
 
-    pub fn from_rows(rows: Vec<&HashMap<String, String>>) -> Data {
+    pub fn from_rows(rows: Vec<&HashMap<String, String>>) -> Self {
         let mut keys = Vec::new();
         let mut owned_rows = Vec::new();
         for key in rows[0].keys() {
@@ -128,7 +154,7 @@ impl Data {
         for row in rows {
             owned_rows.push(row.to_owned());
         }
-        Data {
+        Self {
             filename: "".to_string(),
             headers: keys,
             rows: owned_rows.clone(),
