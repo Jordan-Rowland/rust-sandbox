@@ -6,7 +6,7 @@ use std::io::prelude::*;
 pub struct Data {
     filename: String,
     headers: Vec<String>,
-    rows: Vec<HashMap<String, String>>,
+    rows: Vec<Row>,
     pub rows_len: usize,
 }
 
@@ -14,6 +14,8 @@ pub enum Filename {
     Existing,
     New(String),
 }
+
+type Row = HashMap<String, String>;
 
 // New and initialization methods
 impl Data {
@@ -26,7 +28,7 @@ impl Data {
         }
     }
 
-    pub fn from_rows(rows: Vec<HashMap<String, String>>) -> Self {
+    pub fn from_rows(rows: Vec<Row>) -> Self {
         let mut keys = Vec::new();
         let mut owned_rows = Vec::new();
         for key in rows[0].keys() {
@@ -50,7 +52,7 @@ impl Data {
         &self.headers
     }
 
-    pub fn get_rows(&self) -> &Vec<HashMap<String, String>> {
+    pub fn get_rows(&self) -> &Vec<Row> {
         &self.rows
     }
 
@@ -70,11 +72,7 @@ impl Data {
         Some(found_columns)
     }
 
-    pub fn find_rows_by_column(
-        &self,
-        column: String,
-        value: String,
-    ) -> Vec<HashMap<String, String>> {
+    pub fn find_rows_by_column(&self, column: String, value: String) -> Vec<Row> {
         self.rows
             .clone()
             .into_iter() // READ ON THIS -> .iter
@@ -90,7 +88,7 @@ impl Data {
 
 // Setters
 impl Data {
-    pub fn add_row(&mut self, row: HashMap<String, String>) {
+    pub fn add_row(&mut self, row: Row) {
         let mut proceed = true;
         for header in &self.headers {
             if !row.contains_key(&header.to_lowercase()) {
@@ -114,7 +112,7 @@ impl Data {
         }
     }
 
-    pub fn edit_row(&mut self, index: usize, row: HashMap<String, String>) {
+    pub fn edit_row(&mut self, index: usize, row: Row) {
         self.rows[index] = row;
     }
 
