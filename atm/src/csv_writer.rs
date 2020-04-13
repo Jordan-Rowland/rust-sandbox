@@ -72,8 +72,9 @@ impl Data {
         Some(found_columns)
     }
 
-    pub fn find_rows_by_column(&self, column: &str, value: &str) -> std::io::Result<Vec<Row>> {
-        Ok(self
+    // TODO: Test this
+    pub fn find_rows_by_column(&self, column: &str, value: &str) -> Option<Vec<Row>> {
+        let vec: Vec<Row> = self
             .rows
             .clone()
             .into_iter()
@@ -82,7 +83,34 @@ impl Data {
                     .unwrap()
                     .contains(&value.to_lowercase())
             })
-            .collect())
+            .collect();
+        if !vec.is_empty() {
+            return Some(vec);
+        }
+        None
+    }
+
+    pub fn exact_find_rows_by_column(&self, column: &str, value: &str) -> Option<Vec<Row>> {
+        let vec: Vec<Row> = self
+            .rows
+            .clone()
+            .into_iter()
+            .filter(|row| row.get(&column.to_lowercase()).unwrap() == value)
+            .collect();
+        if !vec.is_empty() {
+            return Some(vec);
+        }
+        None
+    }
+
+    pub fn get_row_index(&self, row: Row) -> Option<usize> {
+        Some(
+            self.rows
+                .clone()
+                .into_iter()
+                .position(|p_row| p_row == row)
+                .unwrap(),
+        )
     }
 }
 
@@ -135,8 +163,8 @@ impl Data {
     pub fn open_file(filename: &str) -> std::io::Result<Self> {
         let mut contents = String::new();
         File::open(filename)?.read_to_string(&mut contents)?;
-        let mut contents_iter = contents.split("\n");
-        let header_iter = contents_iter.next().unwrap().split(",");
+        let mut contents_iter = contents.split('\n');
+        let header_iter = contents_iter.next().unwrap().split(',');
         let mut headers = Vec::new();
         for header in header_iter {
             headers.push(header.to_string().to_lowercase())
@@ -144,8 +172,8 @@ impl Data {
         let mut rows = Vec::new();
         for row in contents_iter {
             let mut row_hashmap = HashMap::new();
-            if row.len() != 0 {
-                let mut row_split = row.split(",");
+            if !row.is_empty() {
+                let mut row_split = row.split(',');
                 for header in headers.clone() {
                     row_hashmap
                         .insert(header, row_split.next().unwrap().to_string().to_lowercase());
@@ -164,7 +192,7 @@ impl Data {
     pub fn write_csv(&self, filename: Filename) -> std::io::Result<()> {
         let string_filename: String;
         match filename {
-            Filename::New(filename) => string_filename = filename.to_owned(),
+            Filename::New(filename) => string_filename = filename,
             Filename::Existing => string_filename = self.filename.to_owned(),
         }
         let mut file = File::create(string_filename)?;
