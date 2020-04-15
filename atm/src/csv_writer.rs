@@ -103,12 +103,12 @@ impl Data {
         None
     }
 
-    pub fn get_row_index(&self, row: Row) -> Option<usize> {
+    pub fn get_row_index(&self, row: &Row) -> Option<usize> {
         Some(
             self.rows
                 .clone()
                 .into_iter()
-                .position(|p_row| p_row == row)
+                .position(|p_row| p_row == *row)
                 .unwrap(),
         )
     }

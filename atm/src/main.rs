@@ -1,5 +1,5 @@
 #![allow(dead_code)]
-
+#![allow(unused_variables)]
 use std::io;
 
 mod csv_writer;
@@ -84,7 +84,24 @@ impl Account {
         self.balance
     }
 
-    // fn transfer_money(&mut self, account_id: u32, amount: u32) {}
+    fn transfer_money(
+        &mut self,
+        d: &mut csv_writer::Data,
+        account_id: u32,
+        amount: i32,
+    ) -> Result<i32, std::io::Error> {
+        let pay_to_user_row = d.exact_find_rows_by_column("id", &account_id.to_string());
+        let pay_to_user_index = d.get_row_index(&pay_to_user_row.unwrap()[0].clone());
+        let self_user_row = d.exact_find_rows_by_column("id", &self.id.to_string());
+        let self_user_index = d.get_row_index(&self_user_row.unwrap()[0]);
+        // TODO: use edit row here:
+        d.drop_row(pay_to_user_index.unwrap());
+        d.drop_row(self_user_index.unwrap());
+        let mut pay_to_user_account = Account::init_from_row(&pay_to_user_row.unwrap()[0]).unwrap();
+        self.balance -= amount;
+        pay_to_user_account.balance += amount;
+        Ok(self.balance)
+    }
 }
 
 fn main() {
@@ -108,7 +125,7 @@ fn main() {
     let _a = find_account_by_id(&d);
     let mut di: Option<usize> = None;
     if let Some(a) = _a {
-        di = d.get_row_index(a);
+        di = d.get_row_index(&a);
     } else {
         println!("FUCK");
     }
