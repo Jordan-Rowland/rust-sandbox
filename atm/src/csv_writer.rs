@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::io::prelude::*;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Data {
     filename: String,
     headers: Vec<String>,
@@ -72,7 +72,6 @@ impl Data {
         Some(found_columns)
     }
 
-    // TODO: Test this
     pub fn find_rows_by_column(&self, column: &str, value: &str) -> Option<Vec<Row>> {
         let vec: Vec<Row> = self
             .rows
@@ -136,12 +135,12 @@ impl Data {
                 }
             }
         } else {
-            println!("Some headers are not valid or missing");
+            println!("Some headers are not valid or are missing");
         }
     }
 
-    pub fn edit_row(&mut self, index: usize, row: Row) {
-        self.rows[index] = row;
+    pub fn edit_row(&mut self, index: usize, row: &Row) {
+        self.rows[index] = row.to_owned();
     }
 
     pub fn drop_row(&mut self, index: usize) {

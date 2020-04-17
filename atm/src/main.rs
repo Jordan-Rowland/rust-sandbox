@@ -68,6 +68,9 @@ impl Account {
         })
     }
 
+    // pub fn to_row(&self) -> csv_writer::Row {}
+    // Pass csv_writer::Data as an arg and create row from headers / struct data
+
     fn display_balance(&self) -> String {
         format!("{}", self.balance as f64 / 100.00)
     }
@@ -90,16 +93,20 @@ impl Account {
         account_id: u32,
         amount: i32,
     ) -> Result<i32, std::io::Error> {
-        let pay_to_user_row = d.exact_find_rows_by_column("id", &account_id.to_string());
-        let pay_to_user_index = d.get_row_index(&pay_to_user_row.unwrap()[0].clone());
-        let self_user_row = d.exact_find_rows_by_column("id", &self.id.to_string());
-        let self_user_index = d.get_row_index(&self_user_row.unwrap()[0]);
-        // TODO: use edit row here:
-        d.drop_row(pay_to_user_index.unwrap());
-        d.drop_row(self_user_index.unwrap());
-        let mut pay_to_user_account = Account::init_from_row(&pay_to_user_row.unwrap()[0]).unwrap();
+        let pay_to_user_row_option = d.exact_find_rows_by_column("id", &account_id.to_string());
+        let self_user_row_option = d.exact_find_rows_by_column("id", &self.id.to_string());
+        let pay_to_user_row = &pay_to_user_row_option.unwrap()[0];
+        let self_user_row = &self_user_row_option.unwrap()[0];
+        let pay_to_user_index = d.get_row_index(pay_to_user_row);
+        let self_user_index = d.get_row_index(self_user_row);
+        let mut pay_to_user_account = Account::init_from_row(pay_to_user_row)?;
         self.balance -= amount;
         pay_to_user_account.balance += amount;
+        println!("{:?}", self_user_row.get("balance"));
+        d.edit_row(pay_to_user_index.unwrap(), pay_to_user_row);
+        d.edit_row(self_user_index.unwrap(), self_user_row);
+        println!("{:?}", d);
+        // d.write_csv(csv_writer::Filename::Existing)?;
         Ok(self.balance)
     }
 }
@@ -114,11 +121,11 @@ fn main() {
 
     // let mut d = initialize();
     let _d = initialize_existing("db.csv");
-    let d = _d.unwrap();
+    let mut d = _d.unwrap();
     // d.add_row(h);
     // d.write_csv(csv_writer::Filename::Existing);
 
-    // let current_user = authenticate(&d);
+    let mut current_user = authenticate(&d).unwrap();
 
     // println!("{:?}", current_user);
 
@@ -130,10 +137,15 @@ fn main() {
         println!("FUCK");
     }
     if let Some(i) = di {
-        println!("line 118: {:?}", d.get_rows()[i]);
+        println!("line 134: {:?}", d.get_rows()[i]);
     } else {
-        println!("line 120: OOPS");
+        println!("line 136: OOPS");
     }
+
+    let t = &current_user.transfer_money(&mut d, 2, 8000);
+    println!("{:?}", current_user);
+    println!("line 141: {:?}", d.get_rows());
+    println!("{:?}", t);
 
     // loop {
     //     println!("Select an action:\n\nD) Deposit\nW) Withdraw\nQ) Quit");
