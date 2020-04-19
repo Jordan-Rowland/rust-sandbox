@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
+use std::collections::HashMap;
 use std::io;
 
 mod csv_writer;
@@ -32,7 +33,7 @@ fn authenticate(d: &csv_writer::Data) -> Option<Account> {
     let _r = d.exact_find_rows_by_column("pin", &pin_input.trim());
     let current_user: Account;
     if let Some(r) = _r {
-        current_user = Account::init_from_row(&r[0]).expect("Cound't initialize from rows;");
+        current_user = Account::from_row(&r[0]).expect("Cound't initialize from rows;");
         Some(current_user)
     } else {
         None
@@ -60,7 +61,7 @@ impl Account {
         Self { id, balance, pin }
     }
 
-    fn init_from_row(row: &csv_writer::Row) -> Result<Self, std::io::Error> {
+    fn from_row(row: &csv_writer::Row) -> Result<Self, std::io::Error> {
         Ok(Self {
             id: row.get("id").unwrap().parse().unwrap(),
             balance: row.get("balance").unwrap().parse().unwrap(),
@@ -68,8 +69,13 @@ impl Account {
         })
     }
 
-    // pub fn to_row(&self) -> csv_writer::Row {}
-    // Pass csv_writer::Data as an arg and create row from headers / struct data
+    pub fn to_row(&self) -> Result<csv_writer::Row, std::io::Error> {
+        let mut row: csv_writer::Row = HashMap::new();
+        row.insert("id".into(), self.id.to_string());
+        row.insert("balance".into(), self.balance.to_string());
+        row.insert("pin".into(), self.pin.to_string());
+        Ok(row)
+    }
 
     fn display_balance(&self) -> String {
         format!("{}", self.balance as f64 / 100.00)
@@ -99,14 +105,16 @@ impl Account {
         let self_user_row = &self_user_row_option.unwrap()[0];
         let pay_to_user_index = d.get_row_index(pay_to_user_row);
         let self_user_index = d.get_row_index(self_user_row);
-        let mut pay_to_user_account = Account::init_from_row(pay_to_user_row)?;
+        let mut pay_to_user_account = Account::from_row(pay_to_user_row)?;
         self.balance -= amount;
         pay_to_user_account.balance += amount;
+        let pay_to_user_new_row = pay_to_user_account.to_row()?;
+        let self_user_new_row = self.to_row()?;
         println!("{:?}", self_user_row.get("balance"));
-        d.edit_row(pay_to_user_index.unwrap(), pay_to_user_row);
-        d.edit_row(self_user_index.unwrap(), self_user_row);
+        d.edit_row(pay_to_user_index.unwrap(), &pay_to_user_new_row);
+        d.edit_row(self_user_index.unwrap(), &self_user_new_row);
         println!("{:?}", d);
-        // d.write_csv(csv_writer::Filename::Existing)?;
+        d.write_csv(csv_writer::Filename::Existing)?;
         Ok(self.balance)
     }
 }
