@@ -21,9 +21,7 @@ fn main() {
 
         let guess: u32 = match guess.trim().parse() {
             Ok(num) => num,
-            Err(_err) => {
-                continue;
-            }
+            Err(_err) => continue,
         };
 
         match guess.cmp(&correct_number) {

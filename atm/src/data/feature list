@@ -1,0 +1,5 @@
+
+create account
+use pin and account ID
+show balance, menu with withdraw, deposit, transfer(need account ID)
+save to file(JSON or CSV, or both)
