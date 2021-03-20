@@ -8,26 +8,17 @@ use crate::account::Account;
 use crate::account::TransactionType;
 
 
-enum TransactionSecurity {
-    Protected,
-    Unproteted,
-}
-
 impl Account {
-    fn increase_balance(&mut self, amount: i64) -> i64 {
+    fn increase_balance(&mut self, amount: u32) -> i64 {
         self.set_balance(amount, TransactionType::Add)
     }
 
-    fn decrease_balance(
-            &mut self,amount: i64,
-            security: TransactionSecurity) -> Result<i64, String> {
-        let secured = matches!(security, TransactionSecurity::Protected);
-        if secured && self.get_balance() < amount {
-            Err(format!(
-                "This transaction is protected will not allow \
-                a charge(${}) greater than the account balance(&{}). \
-                Please run this transaction with TransactionSecurity\
-                ::Unprotected to allow an overdraft.",
+    pub fn decrease_balance(
+            &mut self, amount: u32) -> Result<i64, String> {
+        if self.is_protected() && self.get_balance() < amount as i64 {
+            Err(format!(  // ! Move this to transfer balance function?
+                "This transaction is protected and will not allow \n\
+                a charge(${}) greater than the account balance(${}).\n",
                 amount, self.get_balance()
             ))
         } else {
@@ -36,13 +27,11 @@ impl Account {
     }
 }
 
+
 pub fn transfer_balance(
         from_account: &mut Account,
         to_account: &mut Account,
-        amount: i64) {
-    match from_account.decrease_balance(amount, TransactionSecurity::Protected) {
-        Ok(_) => {to_account.increase_balance(amount);},
-        Err(e) => println!("Transaction Failed: {}", e)
-    }
+        amount: u32) -> Result<i64, String> {
+    from_account.decrease_balance(amount)?;
+    Ok(to_account.increase_balance(amount))
 }
-
