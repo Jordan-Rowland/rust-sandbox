@@ -28,6 +28,8 @@ impl AccountsData {
             .lines()
             .filter(|line| !line.is_empty())
             .map(|line| line.split(','))
+            .enumerate()
+            .filter(|(i, _item)| *i != 0)
             .map(|mut line| {
                 (
                     line.next().unwrap().to_owned(),
@@ -36,9 +38,7 @@ impl AccountsData {
                     line.next().unwrap().to_owned(),
                 )
             })
-            .enumerate()
-            .filter(|(i, _item)| *i != 0)
-            .map(|(i, line)| {
+            .map(|(_i, line)| {
                 (
                     line.0.to_owned(),
                     line.1.parse().unwrap(),
