@@ -21,7 +21,7 @@ fn main() {
     }
     // println!("{:?}", accounts);
 
-    let mut account1 = Account::from_id("8675309", &accounts).unwrap();
+    // let mut account1 = Account::from_id("8675309", &accounts).unwrap();
     // let mut account2 = Account::from_id("4815162", &accounts).unwrap();
     // match bank::transfer_balance(&mut account2, &mut account1, 5000) {
     //     Ok(_) => println!("Transaction Successful."),

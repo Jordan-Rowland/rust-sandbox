@@ -26,28 +26,19 @@ impl AccountsData {
     pub fn read_csv_data() -> Result<Vec<(String, i64, u16, bool)>, Box<dyn error::Error>> {
         Ok(fs::read_to_string("./src/data/csv/db.csv")?
             .lines()
-            .filter(|line| !line.is_empty())
-            .map(|line| line.split(','))
             .enumerate()
-            .filter(|(i, _item)| *i != 0)
+            .filter(|(_i, line)| !line.is_empty())
+            .filter(|(i, _line)| *i != 0)
+            .map(|(_i, line)| line.split(','))
             .map(|mut line| {
                 (
                     line.next().unwrap().to_owned(),
-                    line.next().unwrap().to_owned(),
-                    line.next().unwrap().to_owned(),
-                    line.next().unwrap().to_owned(),
+                    line.next().unwrap().parse().unwrap(),
+                    line.next().unwrap().parse().unwrap(),
+                    line.next().unwrap().parse().unwrap(),
                 )
             })
-            .map(|(_i, line)| {
-                (
-                    line.0.to_owned(),
-                    line.1.parse().unwrap(),
-                    line.2.parse().unwrap(),
-                    line.3.parse().unwrap(),
-                )
-            })
-            .collect::<Vec<(String, i64, u16, bool)>>()
-        )
+            .collect::<Vec<(String, i64, u16, bool)>>())
     }
 
     pub fn write_data_json(
