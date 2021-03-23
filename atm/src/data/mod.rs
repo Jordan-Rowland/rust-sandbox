@@ -1,6 +1,8 @@
-use std::collections::HashMap;
 use serde::{Deserialize, Serialize, Serializer};
+use std::collections::HashMap;
+use std::{error, fs};
 
+const DATA: &str = "db.csv";
 
 #[derive(Serialize, Deserialize, Debug)]
 // #[derive(Debug)]
@@ -11,69 +13,68 @@ pub enum RowValue {
     Protected(bool),
 }
 
-// pub type Row = HashMap<String, RowValue>;
-
+pub type Row = HashMap<String, RowValue>;
 
 #[derive(Serialize, Deserialize, Debug)]
 // #[derive(Debug)]
-pub struct AccountData {
-    pub rows: Vec<RowValue>,
+pub struct AccountsData {
+    // pub rows: Vec<RowValue>,
+    pub rows: Vec<Row>,
 }
 
-
-impl AccountData {
-    fn read_data() {}
-
-    fn write_data() {}
-
-    fn read_csv_data(filename: &str)
-            -> Result<Vec<(String, i64, u16, bool)>, std::Error> {
-                // ! Need to account for Err case
-        let accounts_raw = std::fs::read_to_string("db.csv")?;
-        // let mut accounts_raw = String::new();
-        // if let Ok(accounts) = accounts_fs {
-        //     accounts_raw = accounts;
-        // }
-        let mut accounts: Vec<(String, i64, u16, bool)> = Vec::new();
-        let mut lines: Vec<(String, String, String, String)> = Vec::new();
-        let mut headers: (String, String, String, String) = (
-            String::new(),
-            String::new(),
-            String::new(),
-            String::new(),
-        );
-        for line in accounts_raw.split('\n') {
-            let line = line.trim();
-            if line.is_empty() {
-                continue
-            }
-            let mut line_split = line.split(',');
-            #[cfg(debug_assertions)]  // ! print on debug only
-            println!("{}", line);  // ! print on debug only
-            lines.push(
+impl AccountsData {
+    pub fn read_csv_data() -> Result<Vec<(String, i64, u16, bool)>, Box<dyn error::Error>> {
+        Ok(fs::read_to_string("./src/data/csv/db.csv")?
+            .lines()
+            .filter(|line| !line.is_empty())
+            .map(|line| line.split(','))
+            .map(|mut line| {
                 (
-                    line_split.next().unwrap().to_owned(),
-                    line_split.next().unwrap().to_owned(),
-                    line_split.next().unwrap().to_owned(),
-                    line_split.next().unwrap().to_owned(),
+                    line.next().unwrap().to_owned(),
+                    line.next().unwrap().to_owned(),
+                    line.next().unwrap().to_owned(),
+                    line.next().unwrap().to_owned(),
                 )
-            );
-        }
-
-        for (i, line) in lines.into_iter().enumerate() {
-            if i == 0 {
-                headers = line.to_owned();
-            } else {
-                #[cfg(debug_assertions)]  // ! print on debug only
-                println!("{:?}", line);  // ! print on debug only
-                accounts.push((
+            })
+            .enumerate()
+            .filter(|(i, _item)| *i != 0)
+            .map(|(i, line)| {
+                (
                     line.0.to_owned(),
                     line.1.parse().unwrap(),
                     line.2.parse().unwrap(),
                     line.3.parse().unwrap(),
-                ));
+                )
+            })
+            .collect::<Vec<(String, i64, u16, bool)>>()
+        )
+    }
+
+    pub fn write_data_json(
+        accounts: &Vec<(String, i64, u16, bool)>,
+    ) -> Result<(), Box<dyn error::Error>> {
+        let acc_len = accounts.len();
+        let fmt_rows: Vec<String> = Vec::with_capacity(acc_len);
+        for (i, row) in accounts.iter().enumerate() {
+            let mut str_row = format!(
+                "{{\
+                \"id\":{id:?},\
+                \"balance\":{balance:?},\
+                \"pin\":{pin:?},\
+                \"protected\":{protected:?},}}\
+            ",
+                id = row.0,
+                balance = row.1,
+                pin = row.2,
+                protected = row.3,
+            );
+            if i != acc_len - 1 {
+                str_row.push(',');
             }
+            println!("{}", str_row);
+            // fmt_rows.push(str_row);
         }
-        Ok(accounts)
+        // fs::write("./src/data/db.json", fmt_rows)?;
+        Ok(())
     }
 }
