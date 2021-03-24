@@ -56,9 +56,11 @@ fn main() {
     // let ad = data::AccountsData { rows: vec![row] };
 
     // println!("\n\n\n{:?}", ad);
-    // let s = serde_json::to_string(&ad).unwrap();
     // println!("\n\n\n{:?}", s);
 
-    let a = data::AccountsData::write_data_json(&accounts);
+    let a = data::AccountsData::read_json_data();
 
+
+
+    // println!("{:?}", fmt);
 }
