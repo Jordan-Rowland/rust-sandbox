@@ -44,28 +44,30 @@ impl AccountsData {
 
     // pub fn read_json_data() -> Result<Vec<(String, i64, u16, bool)>, Box<dyn error::Error>> {
     pub fn read_json_data() -> Result<(), Box<dyn error::Error>> {
-        let list_strings: Vec<String> = fs::read_to_string("db.json")?
+        let list_of_values: Vec<(String, i64, u16, bool)> = //list_of_string_values
+        //let list_strings: Vec<String> =
+         fs::read_to_string("db.json")?
             .split("},{")
             .map(|item| item.into())
-            .collect();
+        //     .collect();
 
-        let list_of_lists: Vec<Vec<String>> = list_strings
+        // let list_of_lists: Vec<Vec<String>> = list_strings
             .into_iter()
             .map(|item| item.split(",").map(|item| item.into()).collect::<Vec<_>>())
-            .collect();
+        //     .collect();
 
-        let list_of_string_values: Vec<Vec<String>> = list_of_lists
-            .iter()
+        // let list_of_string_values: Vec<Vec<String>> = list_of_lists
+        //     .iter()
             .map(|vec_item| {
                 vec_item
                     .iter()
                     .map(|inner_item| inner_item.split(":").collect::<Vec<&str>>()[1].to_owned())
                     .collect::<Vec<String>>()
             })
-            .collect();
+        //     .collect();
 
-        let list_of_values: Vec<(String, i64, u16, bool)> = list_of_string_values
-            .iter()
+        // let list_of_values: Vec<(String, i64, u16, bool)> = list_of_string_values
+        //     .iter()
             .map(|vec_item| {
                 vec_item
                     .iter()
@@ -91,7 +93,7 @@ impl AccountsData {
             .collect();
 
         println!("{:#?}", list_of_values);
-        println!("{:?}", list_of_lists.len());
+        // println!("{:?}", list_of_lists.len());
 
         Ok(())
     }
