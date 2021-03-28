@@ -18,7 +18,7 @@ pub fn num_input(prompt: &str) -> Result<u32, std::num::ParseIntError> {
 }
 
 pub fn atm_exit(account: &Account) {
-    // Clean up here, save to db, etc
+    // TODO: Clean up here, save to db, etc
     println!("Exiting {:?}", account);
     std::process::exit(0);
 }

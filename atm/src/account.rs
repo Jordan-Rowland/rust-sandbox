@@ -49,7 +49,7 @@ impl Account {
         }
     }
 
-    pub fn from_id(id: &str, accounts: AccountsData) -> Option<Self> {
+    pub fn from_id(id: &str, accounts: &AccountsData) -> Option<Self> {
         match accounts.rows.iter().find(|row| row.get_id() == id) {
             Some(row) => Some(Self {
                 id: id.to_owned(),

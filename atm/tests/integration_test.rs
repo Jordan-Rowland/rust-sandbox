@@ -101,7 +101,7 @@ mod data_tests {
     }
 
     #[test]
-    fn test_write_to_json() {
+    fn test_write_to_json() -> Result<(), std::io::Error> {
         let expected_output = "[\
             {\"id\":\"8675309\",\"balance\":2000,\"pin\":1234,\"protected\":true},\
             {\"id\":\"4815162\",\"balance\":2000,\"pin\":4321,\"protected\":true},\
@@ -120,11 +120,11 @@ mod data_tests {
         if let Ok(json_data) = accounts.write_json_data(test_filename) {
             assert_eq!(json_data, expected_output);
         }
-        fs::remove_file("./tests/write_test.json");
+        fs::remove_file("./tests/write_test.json")
     }
 
     #[test]
-    fn test_write_to_csv() {
+    fn test_write_to_csv() -> Result<(), std::io::Error> {
         let expected_output = "\
             8675309,2000,1234,true\n\
             4815162,2000,4321,true\n\
@@ -143,7 +143,7 @@ mod data_tests {
         if let Ok(json_data) = accounts.write_csv_data(test_filename) {
             assert_eq!(json_data, expected_output);
         }
-        fs::remove_file("./tests/write_test.csv");
+        fs::remove_file("./tests/write_test.csv")
     }
 }
 

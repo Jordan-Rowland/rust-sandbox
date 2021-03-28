@@ -63,7 +63,7 @@ fn main() {
 
     // println!("{:?}", fmt);
     let mut accounts = data::AccountsData::new();
-    accounts.read_json_data("./data/db.json");
-    let mut account = client::menus::sign_in(accounts).unwrap();
-    client::menus::main_menu(&mut account);
+    accounts.read_json_data("./src/data/db.json");
+    // println!("{:#?}", accounts.rows)
+    client::menus::main_menu(&mut accounts);
 }
