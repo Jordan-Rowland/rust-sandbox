@@ -69,6 +69,7 @@ mod bank_tests {
 
 mod data_tests {
 
+    use std::fs;
     use atm::data;
 
     #[test]
@@ -115,9 +116,11 @@ mod data_tests {
             data::Row::new("5432121".to_string(), 2000, 9999, true),
             data::Row::new("3424551".to_string(), 2000, 9021, true),
         ];
-        if let Ok(json_data) = accounts.write_json_data("./tests/write_test.json") {
+        let test_filename = "./tests/write_test.json";
+        if let Ok(json_data) = accounts.write_json_data(test_filename) {
             assert_eq!(json_data, expected_output);
         }
+        fs::remove_file("./tests/write_test.json");
     }
 
     #[test]
@@ -136,9 +139,11 @@ mod data_tests {
             data::Row::new("5432121".to_string(), 2000, 9999, true),
             data::Row::new("3424551".to_string(), 2000, 9021, true),
         ];
-        if let Ok(json_data) = accounts.write_csv_data("./tests/write_test.csv") {
+        let test_filename = "./tests/write_test.csv";
+        if let Ok(json_data) = accounts.write_csv_data(test_filename) {
             assert_eq!(json_data, expected_output);
         }
+        fs::remove_file("./tests/write_test.csv");
     }
 }
 
