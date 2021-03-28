@@ -1,6 +1,5 @@
-
-use std::io::{self, Write};
 use crate::account::Account;
+use std::io::{self, Write};
 
 pub fn input(prompt: &str) -> String {
     print!("{}\n   > ", prompt);

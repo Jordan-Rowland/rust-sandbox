@@ -1,14 +1,9 @@
 
 
-Tests before proceeding.... ?
-
-
 account |  create account
 account |  multiple accounts - savings/checking?
 account |  use pin and account ID
 
 client  |  show balance, menu with withdraw, deposit, transfer(need account ID)
-
-data    |  save to file(JSON or CSV, or both)
 
 user    |  user with accounts associated

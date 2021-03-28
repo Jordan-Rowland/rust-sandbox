@@ -8,17 +8,17 @@ use std::collections::HashMap;
 use std::io::{self, Write};
 
 // use serde::{Serialize, Deserialize};
-use atm::account::Account;
+use atm::account;
 use atm::bank;
 use atm::client;
 use atm::data;
 
 fn main() {
-    let data = data::AccountsData::read_csv_data();
-    let mut accounts = Vec::with_capacity(5);
-    if let Ok(contents) = data {
-        accounts = contents;
-    }
+    // let data = data::AccountsData::read_csv_data();
+    // let mut accounts = Vec::with_capacity(5);
+    // if let Ok(contents) = data {
+    //     accounts = contents;
+    // }
     // println!("{:?}", accounts);
 
     // let mut account1 = Account::from_id("8675309", &accounts).unwrap();
@@ -30,8 +30,6 @@ fn main() {
 
     // println!("{:?}", account1);
     // println!("{:?}", account2);
-
-    // client::menus::main_menu(&mut account1);
 
     // print!("Please enter an account id > ");
     // io::stdout().flush();
@@ -58,9 +56,14 @@ fn main() {
     // println!("\n\n\n{:?}", ad);
     // println!("\n\n\n{:?}", s);
 
-    let a = data::AccountsData::read_json_data();
+    // let mut accounts = data::AccountsData::new();
+    // accounts.read_json_data();
 
-
+    // println!("{:?}", accounts.rows);
 
     // println!("{:?}", fmt);
+    let mut accounts = data::AccountsData::new();
+    accounts.read_json_data("./data/db.json");
+    let mut account = client::menus::sign_in(accounts).unwrap();
+    client::menus::main_menu(&mut account);
 }
