@@ -102,6 +102,7 @@ pub fn withdraw_menu(account: &mut Account) {
                 continue;
             }
         };
+        // TODO:
         // match transfer {
         //         Ok(_) => {
         //                 println!("{:?}", account);
@@ -113,7 +114,6 @@ pub fn withdraw_menu(account: &mut Account) {
         //                 },
         //             }
     }
-    // println!("Withdraw from {:?}", account);
 }
 
 pub fn deposit_menu(account: &mut Account) {
@@ -144,37 +144,61 @@ pub fn transfer_menu(account: &mut Account, accounts: &AccountsData) {
         if action_account == "E" || action_amount == "E" {
             break;
         }
-        match Account::from_id(&action_account, accounts) {
-            Some(found_account) => {
-                to_account = found_account;
-                ()
-            }
-            None => {
-                println!("{} is not a valid account ID", action_account);
+
+        match (Account::from_id(&action_account, accounts), action_amount.parse::<u32>()) {
+            (None, _) => {
+                println!("{} is not a valid account ID.", action_amount);
                 continue;
             }
-        }
-        match action_amount.parse::<u32>() {
-            Ok(parsed_amount) => {
-                amount = parsed_amount;
-                ()
-            }
-            Err(_) => {
-                println!("{} is not a valid amount", action_amount);
+            (_, Err(_)) => {
+                println!("{} is not a valid amount.", action_amount);
                 continue;
             }
-        }
-        match bank::transfer_balance(account, &mut to_account, amount) {
-            Ok(amt) => {
-                println!(
-                    "Successfully transferred ${} to account {}",
-                    amount,
-                    to_account.get_id()
-                )
+            (Some(found_account), Ok(parsed_amount)) => match bank::transfer_balance(account, &mut to_account, amount) {
+                Ok(amt) => {
+                    println!(
+                        "Successfully transferred ${} to account {}.",
+                        amount,
+                        to_account.get_id()
+                    )
+                }
+                Err(e) => {
+                    println!("{}", e)
+                }
             }
-            Err(e) => {
-                println!("{}", e)
-            }
         }
+
+        // match Account::from_id(&action_account, accounts) {
+        //     Some(found_account) => {
+        //         to_account = found_account;
+        //         ()
+        //     }
+        //     None => {
+        //         println!("{} is not a valid account ID", action_account);
+        //         continue;
+        //     }
+        // }
+        // match action_amount.parse::<u32>() {
+        //     Ok(parsed_amount) => {
+        //         amount = parsed_amount;
+        //         ()
+        //     }
+        //     Err(_) => {
+        //         println!("{} is not a valid amount", action_amount);
+        //         continue;
+        //     }
+        // }
+        // match bank::transfer_balance(account, &mut to_account, amount) {
+        //     Ok(amt) => {
+        //         println!(
+        //             "Successfully transferred ${} to account {}",
+        //             amount,
+        //             to_account.get_id()
+        //         )
+        //     }
+        //     Err(e) => {
+        //         println!("{}", e)
+        //     }
+        // }
     }
 }
