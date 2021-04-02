@@ -1,9 +1,9 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, iter::FromIterator};
 use std::{error, fs};
 
-// const DATA: &str = "db.csv";
+use crate::account::Account;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Row {
     id: String,
     balance: i64,
@@ -38,14 +38,42 @@ impl Row {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct AccountsData {
     pub rows: Vec<Row>,
+}
+
+impl FromIterator<Row> for AccountsData {
+    fn from_iter<I: IntoIterator<Item = Row>>(iter: I) -> Self {
+        let mut c = AccountsData::new();
+
+        for i in iter {
+            c.rows.push(i);
+        }
+
+        c
+    }
 }
 
 impl AccountsData {
     pub fn new() -> Self {
         Self { rows: Vec::new() }
+    }
+
+    pub fn update(&mut self, new_row: Row) -> Row {
+        let new_rows = self.rows.clone();
+        let mut new_rows = new_rows
+            .iter()
+            .filter(|row| row.get_id() != new_row.get_id())
+            .map(|row| row.clone())
+            .collect::<Vec<Row>>();
+        new_rows.push(new_row.clone());
+        self.rows = new_rows.clone();
+        new_row
+    }
+
+    fn push(&mut self, row: Row) {
+        &self.rows.push(row);
     }
 
     pub fn read_csv_data(&mut self, filename: &str) -> Result<(), Box<dyn error::Error>> {
