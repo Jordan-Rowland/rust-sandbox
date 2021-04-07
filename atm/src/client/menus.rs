@@ -10,21 +10,6 @@ pub enum Menu {
     Exit,
 }
 
-// pub fn sign_in(accounts: &AccountsData) {
-//     loop {
-//         let action = input("Please enter an account id, or E to exit");
-//         if action == "E" {
-//             break;
-//         }
-//         if let Some(Account::from_id(&action, accounts) {
-//             return account;
-//         } else {
-//             println!("Could not find account {}", action);
-//             continue;
-//         }
-//     }
-// }
-
 pub fn main_menu(accounts: &mut AccountsData) {
     let mut account = Account::new("123".to_string(), 123, 123);
     loop {
@@ -79,14 +64,14 @@ pub fn main_menu(accounts: &mut AccountsData) {
 
 pub fn action_menu(action: Menu, account: &mut Account, accounts: &mut AccountsData) {
     match action {
-        Menu::Withdraw => withdraw_menu(account),
-        Menu::Deposit => deposit_menu(account),
+        Menu::Withdraw => withdraw_menu(account, accounts),
+        Menu::Deposit => deposit_menu(account, accounts),
         Menu::Transfer => transfer_menu(account, accounts),
-        Menu::Exit => atm_exit(account),
+        Menu::Exit => atm_exit(account, accounts),
     }
 }
 
-pub fn withdraw_menu(account: &mut Account) {
+pub fn withdraw_menu(account: &mut Account, accounts: &mut AccountsData) {
     loop {
         let action = input("Please select an amount to withdraw, or E to exit");
         if action == "E" {
@@ -94,7 +79,10 @@ pub fn withdraw_menu(account: &mut Account) {
         }
         let transfer = match action.parse::<u32>() {
             Ok(withdraw_value) => match account.decrease_balance(withdraw_value) {
-                Ok(v) => println!("=====\nAccount Balance: {}\n=====", v),
+                Ok(value) => {
+                    accounts.update(account.to_row());
+                    println!("=====\nAccount Balance: {}\n=====", value);
+                },
                 Err(e) => println!("=====\n{}\n=====", e),
             },
             Err(value) => {
@@ -116,7 +104,7 @@ pub fn withdraw_menu(account: &mut Account) {
     }
 }
 
-pub fn deposit_menu(account: &mut Account) {
+pub fn deposit_menu(account: &mut Account, accounts: &mut AccountsData) {
     loop {
         let action = input("Please select an amount to deposit`, or E to exit");
         if action == "E" {
@@ -125,6 +113,7 @@ pub fn deposit_menu(account: &mut Account) {
         let deposit = match action.parse::<u32>() {
             Ok(withdraw_value) => {
                 let new_balance = account.increase_balance(withdraw_value);
+                accounts.update(account.to_row());
                 println!("=====\nAccount Balance: {}\n=====", new_balance);
             }
             Err(value) => {
@@ -135,7 +124,7 @@ pub fn deposit_menu(account: &mut Account) {
     }
 }
 
-pub fn transfer_menu(account: &mut Account, accounts: &AccountsData) {
+pub fn transfer_menu(account: &mut Account, accounts: &mut AccountsData) {
     loop {
         let action_account = input("Please enter an account id, or E to exit");
         if action_account == "E" {
@@ -166,11 +155,13 @@ pub fn transfer_menu(account: &mut Account, accounts: &AccountsData) {
                             parsed_amount,
                             found_account.get_id()
                         );
-                        break
+                        accounts.update(account.to_row());
+                        accounts.update(found_account.to_row());
+                        break;
                     }
                     Err(e) => {
                         println!("{}", e);
-                        break
+                        break;
                     }
                 }
             }

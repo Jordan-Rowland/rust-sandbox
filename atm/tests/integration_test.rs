@@ -78,7 +78,6 @@ mod data_tests {
             rows: vec![data::Row::new("8675309".to_string(), 2000, 1234, true)]
         };
         let new_row = data::Row::new("8675309".to_string(), 6000, 1234, true);
-        assert_eq!(*accounts.rows[0].get_id(), *new_row.get_id());
         accounts.update(new_row);
         assert_eq!(accounts.rows.len(), 1);
         assert_eq!(*accounts.rows[0].get_balance(), 6000);

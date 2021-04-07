@@ -5,6 +5,7 @@
 #![allow(unused_must_use)]
 
 use crate::data::AccountsData;
+use crate::data::Row;
 
 #[derive(Debug)]
 pub struct Account {
@@ -59,6 +60,15 @@ impl Account {
             }),
             None => None,
         }
+    }
+
+    pub fn to_row(&self) -> Row {
+        Row::new(
+            self.id.to_string(),
+            self.balance,
+            self.pin,
+            self.protected,
+        )
     }
 
     pub fn increase_balance(&mut self, amount: u32) -> i64 {

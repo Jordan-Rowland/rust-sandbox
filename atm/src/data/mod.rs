@@ -46,11 +46,9 @@ pub struct AccountsData {
 impl FromIterator<Row> for AccountsData {
     fn from_iter<I: IntoIterator<Item = Row>>(iter: I) -> Self {
         let mut c = AccountsData::new();
-
         for i in iter {
             c.rows.push(i);
         }
-
         c
     }
 }
@@ -61,8 +59,8 @@ impl AccountsData {
     }
 
     pub fn update(&mut self, new_row: Row) -> Row {
-        let new_rows = self.rows.clone();
-        let mut new_rows = new_rows
+        let rows = self.rows.clone();
+        let mut new_rows = rows
             .iter()
             .filter(|row| row.get_id() != new_row.get_id())
             .map(|row| row.clone())

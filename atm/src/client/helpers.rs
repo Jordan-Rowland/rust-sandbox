@@ -1,4 +1,5 @@
 use crate::account::Account;
+use crate::data::AccountsData;
 use std::io::{self, Write};
 
 pub fn input(prompt: &str) -> String {
@@ -17,8 +18,10 @@ pub fn num_input(prompt: &str) -> Result<u32, std::num::ParseIntError> {
     user_action.trim().parse()
 }
 
-pub fn atm_exit(account: &Account) {
+pub fn atm_exit(account: &Account, accounts: &mut AccountsData) {
     // TODO: Clean up here, save to db, etc
+    accounts.write_json_data("./src/data/db.json");
+    accounts.write_csv_data("./src/data/db.csv");
     println!("Exiting {:?}", account);
     std::process::exit(0);
 }
